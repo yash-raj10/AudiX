@@ -8,11 +8,10 @@ import {
   FaTrash,
 } from "react-icons/fa";
 import WaveSurfer from "wavesurfer.js";
-
 import { IoMdSend } from "react-icons/io";
 import axios from "axios";
 
-const CapturAudio = ({ hide }) => {
+const CapturAudio = ({ hide, image, name, email }) => {
   const [isRecording, setIsRecording] = useState(true);
   const [recordedAudio, setRecordedAudio] = useState(null);
   const [waveForm, setWaveForm] = useState(null);
@@ -268,22 +267,19 @@ const CapturAudio = ({ hide }) => {
               <IoMdSend
                 className="text-panel-header-icon cursor-pointe text-black"
                 title="Send"
-                // onClick={sendRecording}
               />
             </button>
           </div>
         </div>
-        <div className="flex items-center justify-center pt-10">
-          {audioUrl && (
-            <div>
-              <h2>Uploaded Audio</h2>
-              <audio controls>
-                <source src={audioUrl} type="audio/mpeg" />
-                Your browser does not support the audio element.
-              </audio>
-            </div>
-          )}
-        </div>
+        {audioUrl && (
+          <div className="flex items-center justify-center mt-5">
+            <h2>Uploaded Audio</h2>
+            <audio controls>
+              <source src={audioUrl} type="audio/mpeg" />
+              Your browser does not support the audio element.
+            </audio>
+          </div>
+        )}
 
         <div className="">
           <input

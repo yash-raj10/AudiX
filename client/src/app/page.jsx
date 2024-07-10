@@ -1,28 +1,35 @@
-"use client";
-import Image from "next/image";
-import { FaMicrophone } from "react-icons/fa";
-import { useState } from "react";
-import CapturAudio from "./Components/capturAudio";
+import Rec from "@/components/rec";
+import { currentUser } from "@clerk/nextjs/server";
+import { SignedIn, SignedOut, SignInButton } from "@clerk/nextjs";
 
-export default function Home() {
-  const [showAudioRecorder, setShowAudioRecorder] = useState(false);
+export default async function Home() {
+  const user = await currentUser();
+  const imageUrl = user?.imageUrl;
+  const firstName = user?.firstName;
+  const primaryEmailAddress = user?.primaryEmailAddress?.emailAddress;
 
   return (
-    <div className="flex justify-center items-center w-full">
-      <div className="  border-2 px-4  py-2 rounded-3xl mt-3 max-w-3xl flex ">
+    <div>
+      {user ? (
         <>
-          {!showAudioRecorder && (
-            <button>
-              <FaMicrophone
-                className=" cursor-pointer text-2xl  "
-                title="Record"
-                onClick={() => setShowAudioRecorder(true)}
-              />
-            </button>
-          )}
+          <Rec
+            imageUrl={imageUrl}
+            name={firstName}
+            email={primaryEmailAddress}
+          />
         </>
-        {showAudioRecorder && <CapturAudio hide={setShowAudioRecorder} />}
-      </div>
+      ) : (
+        <div className=" flex justify-center items-center pt-2">
+          <SignedOut>
+            <div className="btn btn-info">
+              {" "}
+              <SignInButton />
+              to Audi
+            </div>
+          </SignedOut>
+          <SignedIn>{/* <UserButton /> */}</SignedIn>
+        </div>
+      )}
     </div>
   );
 }
