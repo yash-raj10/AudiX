@@ -1,0 +1,146 @@
+"use client";
+import axios from "axios";
+import Image from "next/image";
+import React, { useEffect, useState } from "react";
+import { FaCommentAlt } from "react-icons/fa";
+import { useForm } from "react-hook-form";
+import Link from "next/link";
+
+const Middle = () => {
+  const [audiDAta, setAudiDAta] = useState();
+
+  useEffect(() => {
+    const getData = async () => {
+      try {
+        const res = await axios.get(`http://localhost:8080/getAudis`);
+        setAudiDAta(res.data);
+        // console.log(res.data);
+      } catch (error) {
+        console.log(`audis not found`, error);
+      }
+    };
+    getData();
+  }, []);
+
+  const { register, reset, handleSubmit } = useForm({
+    defaultValues: {},
+  });
+
+  const onSubmit = async (data) => {
+    // data.pfpId = parseInt(data.pfpId);
+    // try {
+    //   const res = await axios.post("http://localhost:8080/cmt", data);
+
+    //   if (res.data) {
+    //     console.log(res.data.message);
+    //   } else {
+    //     console.log(res.data.error);
+    //   }
+    // } finally {
+    //   reset();
+    //   await new Promise((resolve) => setTimeout(resolve, 500));
+    //  //  window.location.href = `/profile/${id}`;
+    // }
+    console.log(data);
+    reset();
+  };
+
+  return (
+    <main className="h-full w-full  flex justify-center ">
+      <div className="w-full md:w-1/2 lg:w-1/3 pt-1 ">
+        {audiDAta?.map((audi) => (
+          <div
+            key={audi._id}
+            className="flex flex-col items-center justify-center mt-5 border-2 px-4 py-2 rounded-xl bg-purple-100"
+          >
+            <div className="w-full flex border-b-2 border-purple-500 ">
+              <span className="pr-3 pl-1 pb-2  ">
+                <Image
+                  src={audi.imageUrl}
+                  width={40}
+                  height={40}
+                  alt="Picture of the author"
+                  className="rounded-xl"
+                />
+              </span>
+              <span className=" justify-center items-center flex font-semibold">
+                {audi.name}
+              </span>
+            </div>
+            <div className=" flex justify-center gap-2  w-full sm:w-auto">
+              <audio controls className=" pt-3 ">
+                <source src={audi.audio} type="audio/mpeg" />
+                Your browser does not support the audio element.
+              </audio>
+
+              <span className="flex justify-center items-center pt-3">
+                <Link href={`./cmt/${audi._id}`}>
+                  <FaCommentAlt size={30} />
+                </Link>
+              </span>
+            </div>
+
+            <div>
+              <form onSubmit={handleSubmit(onSubmit)}>
+                <div className="w-full  relative mt-4 sm:flex gap-1  ">
+                  <div className="w-full  relative">
+                    <input
+                      type="text"
+                      id="collage"
+                      name="collage"
+                      {...register("cmt")}
+                      placeholder=" "
+                      required
+                      className={`[&:required:invalid:not(:focus)]:border-purple-300 rounded-xl peer  w-full p-3 font-light bg-white/10 border-2  outline-none transition  disabled:opacity-70 disabled:cursor-not-allowed pl-4 border-neutral-300 focus:border-black`}
+                    />
+                    <label
+                      htmlFor="collage"
+                      className={`absolute text-sm duration-150 transform -translate-y-4 top-5 z-10 origin-[0] left-4 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-4 text-zinc-500 `}
+                    >
+                      Comment Here 👀
+                    </label>
+                  </div>
+                  <div className="">
+                    <input
+                      className="hidden"
+                      type=""
+                      defaultValue={audi?.imageUrl}
+                      {...register("image")}
+                    />
+                  </div>
+
+                  <div className="">
+                    <input
+                      className="hidden"
+                      type=""
+                      defaultValue={audi?.name}
+                      {...register("name")}
+                    />
+                  </div>
+
+                  <div className="">
+                    <input
+                      className="hidden"
+                      type=""
+                      defaultValue={audi?._id}
+                      {...register("audiId")}
+                    />
+                  </div>
+
+                  <button
+                    className=" btn bg-purple-300 btn-sm sm:btn-md  mt-1 sm:mt-0 w-full sm:w-auto "
+                    type="submit"
+                  >
+                    ✅
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        ))}
+      </div>
+    </main>
+  );
+};
+
+export default Middle;

@@ -47,6 +47,8 @@ func init() {
 
 type Audi struct {
 	Name string `json:"name"`
+	Email string `json:"email"`
+	ImageUrl string `json:"imageUrl"`
 	Audio string `json:"audio"`
 }
 
@@ -80,7 +82,7 @@ func main(){
 	uploader := manager.NewUploader(client)
 
 
-	// Routes
+//------------------ Routes -----------------------------------------------
 	r.GET("/", func(c *gin.Context){
 		c.JSON(http.StatusOK, gin.H{
 			"update":"WOrking",
@@ -88,7 +90,6 @@ func main(){
 	})
 
 	r.POST("/upload", func(c *gin.Context){
-
 		name := c.PostForm("name")
 		if name == "" {
 			c.JSON(http.StatusBadRequest, gin.H{
@@ -97,7 +98,25 @@ func main(){
 			return
 		}
 
-		// get the file
+		email := c.PostForm("email")
+		if email == "" {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"error": "email is not there",
+			})
+			return
+		}
+
+		imageUrl := c.PostForm("imageUrl")
+		if imageUrl == "" {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"error": "image is not there",
+			})
+			return
+		}
+
+
+
+		//---------get the file------------------
 		file, err:= c.FormFile("audio")
 		if err != nil {
 			c.JSON(http.StatusOK, gin.H{
@@ -106,7 +125,7 @@ func main(){
 			return
 		} 
 
-//-------------------------- save the file--------------------
+		//----------save the file---------------
 		// save to s3-- (open file)
 		f, openErr := file.Open() 
 		if openErr != nil {
@@ -116,7 +135,7 @@ func main(){
 			return
 		} 
 
-		// (upload file)
+		//--------- upload file -----------------
 		result, UploadErr := uploader.Upload(context.TODO(), &s3.PutObjectInput{
 			Bucket: aws.String("go-file"),
 			Key:    aws.String(file.Filename),
@@ -133,14 +152,18 @@ func main(){
 
 		audi := Audi{
 			Name:  name,
+			Email: email,
+			ImageUrl: imageUrl,
 			Audio: result.Location,
 		}
 		addOneAudi(audi)
 
 
-		// render  the file
+		//--------- render  the file --------------
 		c.JSON(http.StatusOK, gin.H{
 			"name" : name,
+			"email" : email,
+			"imageUrl": imageUrl,
 			"audio": result.Location,
 		})
 	})

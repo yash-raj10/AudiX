@@ -11,7 +11,7 @@ import WaveSurfer from "wavesurfer.js";
 import { IoMdSend } from "react-icons/io";
 import axios from "axios";
 
-const CapturAudio = ({ hide, image, name, email }) => {
+const CapturAudio = ({ hide, image, name, email, onAudioDataChange }) => {
   const [isRecording, setIsRecording] = useState(true);
   const [recordedAudio, setRecordedAudio] = useState(null);
   const [waveForm, setWaveForm] = useState(null);
@@ -153,14 +153,17 @@ const CapturAudio = ({ hide, image, name, email }) => {
   };
 
   const sendRecording = async (data) => {
-    alert("sent");
+    // alert("sent");
     console.log("sent");
-    // console.log(data);
+    console.log(data);
     try {
       const formData = new FormData();
       formData.append("audio", renderedAudio);
       formData.append("name", data.Name);
-      console.log(formData);
+      formData.append("email", data.Email);
+      formData.append("imageUrl", data.ImageUrl);
+
+      // console.log(formData);
       const response = await axios.post(
         "http://localhost:8080/upload",
         formData,
@@ -172,10 +175,11 @@ const CapturAudio = ({ hide, image, name, email }) => {
         }
       );
 
-      console.log(response);
+      // console.log(response);
 
       if (response.status === 200) {
         setAudioUrl(response.data.audio);
+        onAudioDataChange(response.data);
         // console.log("START HERE");
         // console.log(typeof response.data);
         // console.log(response.data);
@@ -195,102 +199,127 @@ const CapturAudio = ({ hide, image, name, email }) => {
   };
 
   return (
-    <div className="flex-col">
-      <form onSubmit={handleSubmit(sendRecording)}>
-        <div className="flex text-2xl w-full justify-end items-center">
-          <div className="pt-1">
-            <FaTrash
-              className="text-panel-header-icon"
-              onClick={() => hide()}
+    <>
+      <div className="flex-col">
+        <form onSubmit={handleSubmit(sendRecording)}>
+          <div className="flex text-2xl w-full justify-end items-center">
+            <div className="pt-1">
+              <FaTrash
+                className="text-panel-header-icon"
+                onClick={() => hide()}
+              />
+            </div>
+
+            <div className=" mx-4 py-2 px-4  rounded-full bg-zinc-500 w-full sm:w-96 text-white text-lg flex gap-3 justify-center items-center ">
+              {isRecording ? (
+                <div className=" text-red-700 animate-pulse w-full  text-center">
+                  Recording <span>{recodingDuration}</span>
+                </div>
+              ) : (
+                <div className="">
+                  {recordedAudio && (
+                    <>
+                      {!isPlaying ? (
+                        <FaPlay
+                          className="text-black"
+                          onClick={handlePlayRecording}
+                        />
+                      ) : (
+                        <FaStop
+                          className="text-black"
+                          onClick={handlePauseRecording}
+                        />
+                      )}
+                    </>
+                  )}
+                </div>
+              )}
+              <div className="w-60" ref={waveFormRef} hidden={isRecording} />
+              {recordedAudio && isPlaying && (
+                <span
+                //  className="text-gray-600"
+                >
+                  {formatTime(currentPlaybackTime)}
+                </span>
+              )}
+              {recordedAudio && !isPlaying && (
+                <span
+                // className="text-gray-600"
+                >
+                  {formatTime(totalDuration)}
+                </span>
+              )}
+              <audio ref={audioRef} hidden />
+            </div>
+
+            <div className="mr-4">
+              {!isRecording ? (
+                <FaMicrophone
+                  className="text-red-500"
+                  onClick={handleStartRecording}
+                />
+              ) : (
+                <FaPauseCircle
+                  className="text-red-500"
+                  onClick={handleStopRecording}
+                />
+              )}
+            </div>
+
+            <div>
+              {" "}
+              <button type="submit">
+                <IoMdSend
+                  className="text-panel-header-icon cursor-pointe text-black"
+                  title="Send"
+                />
+              </button>
+            </div>
+          </div>
+
+          {/* {audioUrl && (
+            <div class="max-w-md mx-auto bg-purple-200 rounded-xl shadow-md px-4 py-2 my-4">
+              <audio
+                controls
+                className=" w-full focus:outline-none [&::-webkit-media-controls-panel]:bg-transparent [&::-webkit-media-controls-play-button]:mr-4 [&::-webkit-media-controls-play-button]:ml-4 [&::-webkit-media-controls-play-button]:scale-150"
+              >
+                <source src={audioUrl} type="audio/mpeg" />
+                <p class="text-gray-600 text-sm mt-2">
+                  Your browser does not support the audio element.
+                </p>
+              </audio>
+            </div>
+          )} */}
+
+          <div className="">
+            <input
+              className="hidden"
+              type=""
+              defaultValue={name}
+              {...register("Name")}
             />
           </div>
 
-          <div className=" mx-4 py-2 px-4 border-2 rounded-full bg-zinc-500 w-96 text-white text-lg flex gap-3 justify-center items-center ">
-            {isRecording ? (
-              <div className=" text-red-700 animate-pulse w-96 text-center">
-                Recording <span>{recodingDuration}</span>
-              </div>
-            ) : (
-              <div className="">
-                {recordedAudio && (
-                  <>
-                    {!isPlaying ? (
-                      <FaPlay
-                        className="text-black"
-                        onClick={handlePlayRecording}
-                      />
-                    ) : (
-                      <FaStop
-                        className="text-black"
-                        onClick={handlePauseRecording}
-                      />
-                    )}
-                  </>
-                )}
-              </div>
-            )}
-            <div className="w-60" ref={waveFormRef} hidden={isRecording} />
-            {recordedAudio && isPlaying && (
-              <span
-              //  className="text-gray-600"
-              >
-                {formatTime(currentPlaybackTime)}
-              </span>
-            )}
-            {recordedAudio && !isPlaying && (
-              <span
-              // className="text-gray-600"
-              >
-                {formatTime(totalDuration)}
-              </span>
-            )}
-            <audio ref={audioRef} hidden />
+          <div className="">
+            <input
+              className="hidden"
+              type=""
+              defaultValue={email}
+              {...register("Email")}
+            />
           </div>
 
-          <div className="mr-4">
-            {!isRecording ? (
-              <FaMicrophone
-                className="text-red-500"
-                onClick={handleStartRecording}
-              />
-            ) : (
-              <FaPauseCircle
-                className="text-red-500"
-                onClick={handleStopRecording}
-              />
-            )}
+          <div className="">
+            <input
+              className="hidden"
+              type=""
+              defaultValue={image}
+              {...register("ImageUrl")}
+            />
           </div>
-
-          <div>
-            {" "}
-            <button type="submit">
-              <IoMdSend
-                className="text-panel-header-icon cursor-pointe text-black"
-                title="Send"
-              />
-            </button>
-          </div>
-        </div>
-        {audioUrl && (
-          <div className="flex items-center justify-center mt-5">
-            <h2>Uploaded Audio</h2>
-            <audio controls>
-              <source src={audioUrl} type="audio/mpeg" />
-              Your browser does not support the audio element.
-            </audio>
-          </div>
-        )}
-
-        <div className="">
-          <input
-            className="hidden"
-            type=""
-            defaultValue="Yash Raj"
-            {...register("Name")}
-          />
-        </div>
-      </form>
-    </div>
+        </form>
+      </div>
+    </>
   );
 };
 

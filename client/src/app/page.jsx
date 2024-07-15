@@ -1,6 +1,7 @@
 import Rec from "@/components/rec";
 import { currentUser } from "@clerk/nextjs/server";
 import { SignedIn, SignedOut, SignInButton } from "@clerk/nextjs";
+import Middle from "@/app/middle";
 
 export default async function Home() {
   const user = await currentUser();
@@ -27,9 +28,10 @@ export default async function Home() {
               to Audi
             </div>
           </SignedOut>
-          <SignedIn>{/* <UserButton /> */}</SignedIn>
+          <SignedIn>{/* <UserButton /> */}.</SignedIn>
         </div>
       )}
+      <Middle />
     </div>
   );
 }

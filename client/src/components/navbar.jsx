@@ -1,10 +1,11 @@
 import React from "react";
 import { SignInButton, SignedIn, SignedOut, UserButton } from "@clerk/nextjs";
+import { SiAudioboom } from "react-icons/si";
 
 const Navbar = async () => {
   return (
-    <div className="navbar bg-base-100 shadow-md border ">
-      <div className=" flex justify-between w-full">
+    <div className="navbar  shadow-md border bg-purple-100 ">
+      <div className=" flex justify-between w-full ">
         <label className="swap swap-rotate">
           {/* this hidden checkbox controls the state */}
           <input
@@ -33,7 +34,9 @@ const Navbar = async () => {
         </label>
 
         <div className="">
-          <a className="btn btn-ghost text-xl">AudiX</a>
+          <a className="btn btn-ghost text-xl border-purple-400 border-2  ">
+            <SiAudioboom /> AudiX
+          </a>
         </div>
 
         <div className="flex gap-2">
