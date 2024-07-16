@@ -1,65 +1,30 @@
+// main.go
 package main
 
 import (
-	"context"
-	"fmt"
 	"log"
 	"net/http"
-	"os"
 
-	"github.com/aws/aws-sdk-go-v2/aws"
-	"github.com/aws/aws-sdk-go-v2/config"
-	"github.com/aws/aws-sdk-go-v2/feature/s3/manager"
-	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
-	"go.mongodb.org/mongo-driver/mongo"
-	"go.mongodb.org/mongo-driver/mongo/options"
+	controller "github.com/yash-raj10/AudiX-Backend/controllers"
+	model "github.com/yash-raj10/AudiX-Backend/models"
 )
 
-
-var collection *mongo.Collection
-
-// mongoDB initialization
-func init() {
+func main() {
 	err := godotenv.Load(".env.local")
 	if err != nil {
-	  log.Fatalf("Error loading .env file")
-	}
-	Link := os.Getenv("Link")
-	fmt.Println(Link)
-
-
-
-	clientOption := options.Client().ApplyURI(Link)
-
-	client, err := mongo.Connect(context.TODO(), clientOption)
-	if err != nil {
-		log.Fatal(err)
+		log.Fatal("Error loading .env file in main")
 	}
 
-	fmt.Print("Connection Success\n")
+	// Initialize the database
+	model.InitDB()
 
-	collection = client.Database("audiX").Collection("audi")
-	fmt.Print("Instance is Ready\n")
-}
+	// Initialize the S3 uploader
+	model.InitUploader()
 
-type Audi struct {
-	Name string `json:"name"`
-	Email string `json:"email"`
-	ImageUrl string `json:"imageUrl"`
-	Audio string `json:"audio"`
-}
-
-
-func main(){
-	err := godotenv.Load(".env.local")
-	if err != nil{
-		log.Fatal("ERROr")
-	}
-
-	// gin app setup
+	// Gin app setup
 	r := gin.Default()
 
 	// Apply CORS middleware
@@ -72,110 +37,17 @@ func main(){
 	}))
 	r.MaxMultipartMemory = 8 << 20
 
-	//s3 Uploader setup
-	cfg, err := config.LoadDefaultConfig(context.TODO())
-	if err != nil {
-		log.Printf("error: %v", err)
-	return
-	}
-	client := s3.NewFromConfig(cfg)
-	uploader := manager.NewUploader(client)
-
-
-//------------------ Routes -----------------------------------------------
-	r.GET("/", func(c *gin.Context){
+	// Routes
+	r.GET("/", func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{
-			"update":"WOrking",
+			"update": "Working",
 		})
 	})
+	r.POST("/upload", controller.UploadHandler)
+	r.GET("/getAudis", controller.GetAudis)
+	r.POST("/cmt", controller.CreateCmt)
+	r.GET("/cmts/:id", controller.GetCmts)
 
-	r.POST("/upload", func(c *gin.Context){
-		name := c.PostForm("name")
-		if name == "" {
-			c.JSON(http.StatusBadRequest, gin.H{
-				"error": "Name is not there",
-			})
-			return
-		}
-
-		email := c.PostForm("email")
-		if email == "" {
-			c.JSON(http.StatusBadRequest, gin.H{
-				"error": "email is not there",
-			})
-			return
-		}
-
-		imageUrl := c.PostForm("imageUrl")
-		if imageUrl == "" {
-			c.JSON(http.StatusBadRequest, gin.H{
-				"error": "image is not there",
-			})
-			return
-		}
-
-
-
-		//---------get the file------------------
-		file, err:= c.FormFile("audio")
-		if err != nil {
-			c.JSON(http.StatusOK, gin.H{
-				"error":"Failed to get the audio",
-			})
-			return
-		} 
-
-		//----------save the file---------------
-		// save to s3-- (open file)
-		f, openErr := file.Open() 
-		if openErr != nil {
-			c.JSON(http.StatusOK, gin.H{
-				"error":"Failed to open audio file",
-			})
-			return
-		} 
-
-		//--------- upload file -----------------
-		result, UploadErr := uploader.Upload(context.TODO(), &s3.PutObjectInput{
-			Bucket: aws.String("go-file"),
-			Key:    aws.String(file.Filename),
-			Body:   f,
-			ACL: "public-read",
-		})
-		if UploadErr != nil {
-			c.JSON(http.StatusOK, gin.H{
-				"error":"Failed to Upload audio",
-			})
-			return
-		} 
-
-
-		audi := Audi{
-			Name:  name,
-			Email: email,
-			ImageUrl: imageUrl,
-			Audio: result.Location,
-		}
-		addOneAudi(audi)
-
-
-		//--------- render  the file --------------
-		c.JSON(http.StatusOK, gin.H{
-			"name" : name,
-			"email" : email,
-			"imageUrl": imageUrl,
-			"audio": result.Location,
-		})
-	})
-
+	// Run the server
 	r.Run()
-}
-
-func addOneAudi(audi Audi) {
-	added, err := collection.InsertOne(context.Background(), audi)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	fmt.Println("Added audi with id:", added.InsertedID)
 }
