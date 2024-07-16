@@ -5,9 +5,14 @@ import React, { useEffect, useState } from "react";
 import { FaCommentAlt } from "react-icons/fa";
 import { useForm } from "react-hook-form";
 import Link from "next/link";
+import { useUser } from "@clerk/clerk-react";
 
 const Middle = () => {
   const [audiDAta, setAudiDAta] = useState();
+  const [activeAudioId, setActiveAudioId] = useState(null);
+  const { user } = useUser();
+  const ImageUrl = user?.imageUrl;
+  const Name = user?.firstName;
 
   useEffect(() => {
     const getData = async () => {
@@ -27,22 +32,42 @@ const Middle = () => {
   });
 
   const onSubmit = async (data) => {
-    // data.pfpId = parseInt(data.pfpId);
-    // try {
-    //   const res = await axios.post("http://localhost:8080/cmt", data);
+    // console.log(data);
+    if (!activeAudioId) {
+      console.error("No audio selected for comment");
+      return;
+    }
 
-    //   if (res.data) {
-    //     console.log(res.data.message);
-    //   } else {
-    //     console.log(res.data.error);
-    //   }
-    // } finally {
-    //   reset();
-    //   await new Promise((resolve) => setTimeout(resolve, 500));
-    //  //  window.location.href = `/profile/${id}`;
-    // }
-    console.log(data);
-    reset();
+    const activeAudio = audiDAta.find((audi) => audi._id === activeAudioId);
+    if (!activeAudio) {
+      console.error("Selected audio not found");
+      return;
+    }
+
+    const commentData = {
+      cmt: data.cmt,
+      image: ImageUrl,
+      name: Name,
+      audiId: activeAudioId,
+    };
+
+    try {
+      const res = await axios.post("http://localhost:8080/cmt", commentData);
+      if (res.data) {
+        console.log(res.data.message);
+      } else {
+        console.log(res.data.error);
+      }
+    } catch (error) {
+      console.error("Error submitting comment:", error);
+    } finally {
+      reset();
+      // setActiveAudioId(null);
+    }
+
+    // console.log(commentData);
+    // reset();
+    // setActiveAudioId(null);
   };
 
   return (
@@ -67,74 +92,65 @@ const Middle = () => {
                 {audi.name}
               </span>
             </div>
-            <div className=" flex justify-center gap-2  w-full sm:w-auto">
-              <audio controls className=" pt-3 ">
+
+            <div className="flex justify-center items-center w-full sm:w-auto">
+              <audio controls className=" pt-3   ">
                 <source src={audi.audio} type="audio/mpeg" />
                 Your browser does not support the audio element.
               </audio>
+            </div>
 
-              <span className="flex justify-center items-center pt-3">
+            <div className=" flex justify-center gap-4 pt-1  w-full sm:w-auto">
+              <span className="flex flex-col justify-center items-center pt-3 text-xs">
                 <Link href={`./cmt/${audi._id}`}>
                   <FaCommentAlt size={30} />
                 </Link>
+                <p>(Previous cmts)</p>
               </span>
+
+              <button
+                onClick={() => setActiveAudioId(audi._id)}
+                className="btn bg-purple-300 btn-sm sm:btn-md mt-2"
+              >
+                Comment on this Audi
+              </button>
             </div>
 
             <div>
-              <form onSubmit={handleSubmit(onSubmit)}>
-                <div className="w-full  relative mt-4 sm:flex gap-1  ">
-                  <div className="w-full  relative">
-                    <input
-                      type="text"
-                      id="collage"
-                      name="collage"
-                      {...register("cmt")}
-                      placeholder=" "
-                      required
-                      className={`[&:required:invalid:not(:focus)]:border-purple-300 rounded-xl peer  w-full p-3 font-light bg-white/10 border-2  outline-none transition  disabled:opacity-70 disabled:cursor-not-allowed pl-4 border-neutral-300 focus:border-black`}
-                    />
-                    <label
-                      htmlFor="collage"
-                      className={`absolute text-sm duration-150 transform -translate-y-4 top-5 z-10 origin-[0] left-4 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-4 text-zinc-500 `}
+              {activeAudioId === audi._id && (
+                <form
+                  onSubmit={handleSubmit(onSubmit)}
+                  id={audi?._id}
+                  method="none"
+                  action="javascript:void(0);"
+                >
+                  <div className="w-full  relative mt-4 sm:flex gap-1  ">
+                    <div className="w-full  relative">
+                      <input
+                        type="text"
+                        id="comment"
+                        {...register("cmt")}
+                        placeholder=" "
+                        required
+                        className={`[&:required:invalid:not(:focus)]:border-purple-300 rounded-xl peer  w-full p-3 font-light bg-white/10 border-2  outline-none transition  disabled:opacity-70 disabled:cursor-not-allowed pl-4 border-neutral-300 focus:border-black`}
+                      />
+                      <label
+                        htmlFor="comment"
+                        className={`absolute text-sm duration-150 transform -translate-y-4 top-5 z-10 origin-[0] left-4 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-4 text-zinc-500 `}
+                      >
+                        Comment Here 👀
+                      </label>
+                    </div>
+
+                    <button
+                      className=" btn bg-purple-300 btn-sm sm:btn-md  mt-1 sm:mt-0 w-full sm:w-auto "
+                      type="submit"
                     >
-                      Comment Here 👀
-                    </label>
+                      ✅
+                    </button>
                   </div>
-                  <div className="">
-                    <input
-                      className="hidden"
-                      type=""
-                      defaultValue={audi?.imageUrl}
-                      {...register("image")}
-                    />
-                  </div>
-
-                  <div className="">
-                    <input
-                      className="hidden"
-                      type=""
-                      defaultValue={audi?.name}
-                      {...register("name")}
-                    />
-                  </div>
-
-                  <div className="">
-                    <input
-                      className="hidden"
-                      type=""
-                      defaultValue={audi?._id}
-                      {...register("audiId")}
-                    />
-                  </div>
-
-                  <button
-                    className=" btn bg-purple-300 btn-sm sm:btn-md  mt-1 sm:mt-0 w-full sm:w-auto "
-                    type="submit"
-                  >
-                    ✅
-                  </button>
-                </div>
-              </form>
+                </form>
+              )}
             </div>
           </div>
         ))}
