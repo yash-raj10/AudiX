@@ -4,7 +4,6 @@ import { useForm } from "react-hook-form";
 import { useEffect, useState } from "react";
 import { useUser } from "@clerk/clerk-react";
 import axios from "axios";
-import { BsIncognito } from "react-icons/bs";
 import Image from "next/image";
 
 const page = ({ params }) => {
@@ -120,45 +119,54 @@ const page = ({ params }) => {
           {!(cmtArr == [] || cmtData) && (
             <div> Nothing is there, Be the first one to Comment!</div>
           )}
-          {cmtArr?.toReversed().map((cmt) => (
-            <div className="w-full border-2 rounded-xl border-purple-300 bg-purple-100 flex my-2">
-              <div className=" w-1/4 flex flex-col sm:flex-row justify-center items-center border-b-2 pl-2 py-1 ">
-                <Image
-                  src={cmt.image}
-                  width={40}
-                  height={40}
-                  alt="Picture of the author"
-                  className="rounded-xl "
-                />
-                <span className=" w-full flex justify-center items-center">
-                  {cmt.name}
-                </span>
-              </div>
-              <div className="rounded-xl border-2 my-1 w-3/4 border-purple-300 bg-white  flex justify-center items-center  mr-1 p-1">
-                {cmt.cmt}
-              </div>
-            </div>
-          ))}
 
-          {cmtData?.toReversed().map((cmt) => (
-            <div className="w-full border-2 rounded-xl border-purple-300 bg-purple-100 flex my-2">
-              <div className=" w-1/4 flex flex-col sm:flex-row justify-center items-center border-b-2 pl-2 py-1 ">
-                <Image
-                  src={cmt.image}
-                  width={40}
-                  height={40}
-                  alt="Picture of the author"
-                  className="rounded-xl "
-                />
-                <span className=" w-full flex justify-center items-center">
-                  {cmt.name}
-                </span>
-              </div>
-              <div className="rounded-xl border-2 my-1 w-3/4 border-purple-300 bg-white  flex justify-center items-center  mr-1 p-1">
-                {cmt.cmt}
-              </div>
+          {cmtArr && (
+            <div>
+              {cmtArr?.toReversed().map((cmt) => (
+                <div className="w-full border-2 rounded-xl border-purple-300 bg-purple-100 flex my-2">
+                  <div className=" w-1/4 flex flex-col sm:flex-row justify-center items-center border-b-2 pl-2 py-1 ">
+                    <Image
+                      src={cmt.image}
+                      width={40}
+                      height={40}
+                      alt="Picture of the author"
+                      className="rounded-xl "
+                    />
+                    <span className=" w-full flex justify-center items-center">
+                      {cmt.name}
+                    </span>
+                  </div>
+                  <div className="rounded-xl border-2 my-1 w-3/4 border-purple-300 bg-white  flex justify-center items-center  mr-1 p-1">
+                    {cmt.cmt}
+                  </div>
+                </div>
+              ))}
             </div>
-          ))}
+          )}
+
+          {cmtData && (
+            <div>
+              {cmtData?.toReversed().map((cmt) => (
+                <div className="w-full border-2 rounded-xl border-purple-300 bg-purple-100 flex my-2">
+                  <div className=" w-1/4 flex flex-col sm:flex-row justify-center items-center border-b-2 pl-2 py-1 ">
+                    <Image
+                      src={cmt.image}
+                      width={40}
+                      height={40}
+                      alt="Picture of the author"
+                      className="rounded-xl "
+                    />
+                    <span className=" w-full flex justify-center items-center">
+                      {cmt.name}
+                    </span>
+                  </div>
+                  <div className="rounded-xl border-2 my-1 w-3/4 border-purple-300 bg-white  flex justify-center items-center  mr-1 p-1">
+                    {cmt.cmt}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       </div>
     </div>
