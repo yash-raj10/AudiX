@@ -6,6 +6,7 @@ module.exports = {
     "./components/**/*.{js,jsx}",
     "./app/**/*.{js,jsx}",
     "./src/**/*.{js,jsx}",
+    "./node_modules/preline/preline.js",
   ],
   prefix: "",
   theme: {
@@ -73,7 +74,11 @@ module.exports = {
       },
     },
   },
-  plugins: [require("daisyui"), require("tailwindcss-animate")],
+  plugins: [
+    require("daisyui"),
+    require("tailwindcss-animate"),
+    require("preline/plugin"),
+  ],
   daisyui: {
     themes: ["light"],
   },

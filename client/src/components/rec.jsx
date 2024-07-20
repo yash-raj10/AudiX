@@ -17,7 +17,7 @@ export default function Rec({ imageUrl, name, email }) {
   return (
     <>
       <div className="flex justify-center items-center w-full">
-        <div className="  border-2 px-4  py-2 rounded-3xl mt-3 max-w-3xl flex border-purple-500 bg-purple-200  ">
+        <div className="  border-2 px-4  py-2 rounded-3xl mt-3 max-w-3xl flex border-purple-500   ">
           <>
             {!showAudioRecorder && (
               <div

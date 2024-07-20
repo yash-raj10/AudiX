@@ -17,7 +17,8 @@ const Middle = () => {
   useEffect(() => {
     const getData = async () => {
       try {
-        const res = await axios.get(`http://localhost:8080/getAudis`);
+        80;
+        const res = await axios.get(`${process.env.NEXT_PUBLIC_URL}/getAudis`);
         setAudiDAta(res.data);
         // console.log(res.data);
       } catch (error) {
@@ -52,7 +53,10 @@ const Middle = () => {
     };
 
     try {
-      const res = await axios.post("http://localhost:8080/cmt", commentData);
+      const res = await axios.post(
+        `${process.env.NEXT_PUBLIC_URL}/cmt`,
+        commentData
+      );
       if (res.data) {
         console.log(res.data.message);
       } else {
@@ -71,7 +75,17 @@ const Middle = () => {
   };
 
   return (
-    <main className="h-full w-full  flex justify-center ">
+    <main
+      className=" h-full w-full  flex justify-center before:absolute before:top-0 before:start-1/2 before:bg-no-repeat before:bg-top before:size-full before:-z-[1] before:transform before:-translate-x-1/2"
+      style={{
+        "--tw-bg-opacity": "1",
+        backgroundImage:
+          "url('https://preline.co/assets/svg/examples/squared-bg-element.svg')",
+        backgroundSize: "auto",
+      }}
+
+      // className="h-full w-full  flex justify-center "
+    >
       <div className="w-full md:w-1/2 lg:w-1/3 pt-1 ">
         {audiDAta?.map((audi) => (
           <div
