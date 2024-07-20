@@ -165,7 +165,7 @@ const CapturAudio = ({ hide, image, name, email, onAudioDataChange }) => {
 
       // console.log(formData);
       const response = await axios.post(
-        `${process.env.NEXT_PUBLIC_URL}upload`,
+        `${process.env.NEXT_PUBLIC_URL}/upload`,
         formData,
         // data,
         {

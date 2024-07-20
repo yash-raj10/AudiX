@@ -17,7 +17,6 @@ export default function RootLayout({ children }) {
     <ClerkProvider>
       <html lang="en">
         <PrelineScript />
-
         <body className={inter.className}>
           <Navbar />
           {children}

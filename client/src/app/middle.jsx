@@ -17,7 +17,6 @@ const Middle = () => {
   useEffect(() => {
     const getData = async () => {
       try {
-        80;
         const res = await axios.get(`${process.env.NEXT_PUBLIC_URL}/getAudis`);
         setAudiDAta(res.data);
         // console.log(res.data);

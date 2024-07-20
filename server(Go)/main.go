@@ -2,21 +2,19 @@
 package main
 
 import (
-	"log"
 	"net/http"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
-	"github.com/joho/godotenv"
 	controller "github.com/yash-raj10/AudiX-Backend/controllers"
 	model "github.com/yash-raj10/AudiX-Backend/models"
 )
 
 func main() {
-	err := godotenv.Load(".env.local")
-	if err != nil {
-		log.Fatal("Error loading .env file in main")
-	}
+	// err := godotenv.Load(".env.local")
+	// if err != nil {
+	// 	log.Fatal("Error loading .env file in main")
+	// }
 
 	// Initialize the database
 	model.InitDB()

@@ -10,7 +10,6 @@ import (
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/feature/s3/manager"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
-	"github.com/joho/godotenv"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -38,10 +37,10 @@ var Collection2 *mongo.Collection
 
 
 func InitDB() {
-	err := godotenv.Load(".env.local")
-	if err != nil {
-		log.Fatalf("Error loading .env file")
-	}
+	// err := godotenv.Load(".env.local")
+	// if err != nil {
+	// 	log.Fatalf("Error loading .env file")
+	// }
 	Link := os.Getenv("Link")
 	fmt.Println(Link)
 
